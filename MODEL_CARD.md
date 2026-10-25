@@ -1,7 +1,8 @@
 # Model card: KisanSense crop classifier
 
-**Version:** see MLflow registry alias `champion` (model `kisansense-classifier`)
-**Owner:** fill in your name and course details
+**Version:** 2 (MLflow registry alias `champion`, model `kisansense-classifier`)
+**Owner:** KisanSense MLOps Project
+**License:** MIT
 
 ## Intended use
 Advisory tool that suggests which of 22 crops suit a plot, given soil nitrogen, phosphorus,
@@ -13,16 +14,21 @@ Crop insurance decisions, loan eligibility, or any use where a wrong suggestion 
 person's access to money or services.
 
 ## Training data
-Kaggle "Crop Recommendation Dataset" (2,200 rows, 100 per crop). The synthetic generator in
-`src/make_dataset.py` is a development stand-in only. Data version: the `data_md5` tag on the
-MLflow run and the hash in `data/raw/*.dvc`.
+Kaggle "Crop Recommendation Dataset" with simulated seasonal climate shifts (3,300 rows total).
+Data versioning: tracked via DVC with MD5 hashes (`data/raw/Crop_recommendation.csv.dvc`).
 
 ## Model
-Random Forest (scikit-learn), hyperparameters in `params.yaml`.
+Random Forest Classifier (`n_estimators=300`, `max_depth=20`, `seed=42`).
 
-## Metrics
-Fill from `metrics.json` after training: macro F1, accuracy, and F1 per rainfall band
-(low, mid, high), which stands in for agro-climatic region.
+## Metrics (from metrics.json)
+- **Macro F1 Score:** 0.9696 (96.96%)
+- **Overall Accuracy:** 0.9697 (96.97%)
+- **Fairness by Rainfall Zone (Agro-climatic region proxy):**
+  - Low Rainfall Zone: 0.9622 F1
+  - Mid Rainfall Zone: 0.9923 F1
+  - High Rainfall Zone: 0.9689 F1
+  - **Regional Gap:** 0.0301 (Well under the maximum threshold of 0.10)
+- **Evaluation vs Previous Champion:** Retrained model beat the previous champion (0.9696 vs 0.9376) on the same held-out test split, satisfying the promotion contract.
 
 ## Known limits
 - Only 22 crops. No market price, irrigation, seed variety, pest or labour inputs.
