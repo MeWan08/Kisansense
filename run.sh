@@ -4,6 +4,13 @@
 # Tasks: data, validate, train, test, lint, run, mlflow, docker, up, drift-demo, clean
 
 set -e
+
+# Automatically use the project's virtualenv if not already in PATH
+VENV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/.venv/Scripts"
+if [ -d "$VENV_DIR" ]; then
+  export PATH="$VENV_DIR:$PATH"
+fi
+
 export MLFLOW_DISABLE_TELEMETRY=true
 export MLFLOW_DISABLE_AGENT_HINT=1
 export PYTHONUTF8=1

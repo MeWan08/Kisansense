@@ -9,7 +9,7 @@ services:
     environment:
       API_KEY: dev-key
       MODEL_VERSION: local
-    ports: ["${API_HOST_PORT:-8080}:8080"]   # on Windows with Steam running: $env:API_HOST_PORT=8000
+    ports: ["8088:8080"]
 
   mlflow:
     image: python:3.13-slim

@@ -13,3 +13,5 @@ logs/
 /data/raw/Crop_recommendation.csv
 .env
 k8s/secret.yaml
+
+.npm-cache/
