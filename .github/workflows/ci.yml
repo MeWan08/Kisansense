@@ -6,7 +6,7 @@ on:
   pull_request:
 
 env:
-  AWS_REGION: ap-south-1
+  AWS_REGION: eu-north-1
   ECR_REPOSITORY: kisansense
   MLFLOW_TRACKING_URI: sqlite:///mlflow.db
   MLFLOW_DISABLE_TELEMETRY: "true"
