@@ -1,0 +1,51 @@
+# Production stack for AWS EC2 deployment.
+# Runs: API (backend) + Frontend (nginx) + Prometheus + Grafana
+# Usage: docker compose -f docker-compose.prod.yml up -d
+services:
+  api:
+    image: ${ECR_REGISTRY:-kisansense}:${IMAGE_TAG:-latest}
+    restart: always
+    environment:
+      API_KEY: ${API_KEY:-changeme}
+      MODEL_VERSION: ${IMAGE_TAG:-latest}
+    ports: ["8080:8080"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  frontend:
+    image: ${ECR_REGISTRY_FRONTEND:-kisansense-frontend}:${IMAGE_TAG:-latest}
+    restart: always
+    ports: ["80:80"]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    ports: ["9090:9090"]
+    depends_on: [api]
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports: ["3000:3000"]
+    depends_on: [prometheus]
+
+volumes:
+  prometheus-data:
+  grafana-data:

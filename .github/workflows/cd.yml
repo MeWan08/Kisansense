@@ -1,0 +1,163 @@
+name: cd
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:            # Allow manual trigger from GitHub UI
+
+env:
+  AWS_REGION: eu-north-1
+  ECR_REPO_API: kisansense
+  ECR_REPO_FRONTEND: kisansense-frontend
+
+jobs:
+  # ──────────────────────────────────────
+  # 1. Build & push backend Docker image
+  # ──────────────────────────────────────
+  build-backend:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.vars.outputs.tag }}
+      registry: ${{ steps.ecr.outputs.registry }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      # Train model to get model.joblib + data/reference.csv
+      - name: Install and train
+        env:
+          MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+          MLFLOW_DISABLE_TELEMETRY: "true"
+          MLFLOW_DISABLE_AGENT_HINT: "1"
+        run: |
+          pip install -r requirements.txt
+          dvc pull data/raw/Crop_recommendation.csv || python src/make_dataset.py
+          python src/train.py
+          python src/gate.py
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - id: vars
+        run: echo "tag=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+      - name: Build & push API image
+        run: |
+          TAG=${{ steps.vars.outputs.tag }}
+          IMAGE=${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO_API }}
+          docker build --build-arg MODEL_VERSION=$TAG -t $IMAGE:$TAG -t $IMAGE:latest .
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:latest
+
+  # ──────────────────────────────────────
+  # 2. Build & push frontend Docker image
+  # ──────────────────────────────────────
+  build-frontend:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.vars.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - id: vars
+        run: echo "tag=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+      - name: Build & push frontend image
+        working-directory: frontend
+        run: |
+          TAG=${{ steps.vars.outputs.tag }}
+          IMAGE=${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPO_FRONTEND }}
+          docker build \
+            --build-arg VITE_API_BASE_URL=http://${{ secrets.EC2_HOST }}:8080 \
+            -t $IMAGE:$TAG -t $IMAGE:latest .
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:latest
+
+  # ──────────────────────────────────────
+  # 3. Deploy to EC2 via SSH
+  # ──────────────────────────────────────
+  deploy:
+    needs: [build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Copy compose file to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "docker-compose.prod.yml,monitoring/"
+          target: "/home/ec2-user/kisansense"
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          TAG: ${{ needs.build-backend.outputs.image_tag }}
+          REGISTRY: ${{ needs.build-backend.outputs.registry }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: TAG,REGISTRY
+          script: |
+            # Login to ECR
+            aws ecr get-login-password --region ap-south-1 | \
+              docker login --username AWS --password-stdin $REGISTRY
+
+            cd /home/ec2-user/kisansense
+
+            # Set environment for compose
+            export ECR_REGISTRY=$REGISTRY/kisansense
+            export ECR_REGISTRY_FRONTEND=$REGISTRY/kisansense-frontend
+            export IMAGE_TAG=$TAG
+            export API_KEY=${{ secrets.API_KEY }}
+
+            # Pull latest images and restart
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            # Cleanup old images
+            docker image prune -f
+
+            # Health check
+            echo "Waiting for API to be healthy..."
+            for i in $(seq 1 30); do
+              if curl -sf http://localhost:8080/health > /dev/null 2>&1; then
+                echo "✅ API is healthy!"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "❌ API health check failed"
+            docker compose -f docker-compose.prod.yml logs api --tail=50
+            exit 1
