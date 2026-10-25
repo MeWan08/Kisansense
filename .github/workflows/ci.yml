@@ -1,0 +1,120 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: kisansense
+  MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+  MLFLOW_DISABLE_TELEMETRY: "true"
+  MLFLOW_DISABLE_AGENT_HINT: "1"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Lint
+        run: ruff check src tests
+
+      # Pull the dataset from the DVC remote when credentials exist, else fall back to synthetic data.
+      - name: Get data
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          dvc pull data/raw/Crop_recommendation.csv || python src/make_dataset.py
+
+      - name: Validate data
+        run: python src/validate.py data/raw/Crop_recommendation.csv
+
+      - name: Unit tests
+        run: pytest -q
+
+      - name: Train
+        run: python src/train.py
+
+      - name: Quality gate
+        run: python src/gate.py
+
+      - name: Promote in registry
+        run: python src/promote.py
+
+      - name: Upload model and metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-bundle
+          path: |
+            model.joblib
+            data/reference.csv
+            metrics.json
+
+  push-image:
+    needs: build-test
+    # Set the repository variable ECR_PUSH=true once the AWS secrets and ECR repository exist.
+    if: github.ref == 'refs/heads/main' && vars.ECR_PUSH == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: model-bundle
+          path: .
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push (tag = git sha)
+        run: |
+          TAG=${GITHUB_SHA::8}
+          IMAGE=${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}
+          docker build --build-arg MODEL_VERSION=$TAG -t $IMAGE:$TAG -t $IMAGE:latest .
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:latest
+          echo "image: $IMAGE:$TAG" >> $GITHUB_STEP_SUMMARY
+
+  deploy:
+    needs: push-image
+    # Set the repository variable DEPLOY=true once a cluster is reachable from CI.
+    if: github.ref == 'refs/heads/main' && vars.DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Configure kubectl
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_B64 }}" | base64 -d > ~/.kube/config
+      - name: Rolling update
+        run: |
+          TAG=${GITHUB_SHA::8}
+          IMAGE=${{ steps.ecr.outputs.registry }}/kisansense:$TAG
+          kubectl -n kisansense set image deployment/kisansense api=$IMAGE
+          kubectl -n kisansense set env deployment/kisansense MODEL_VERSION=$TAG
+          kubectl -n kisansense rollout status deployment/kisansense --timeout=180s

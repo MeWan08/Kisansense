@@ -1,0 +1,15 @@
+# Apply everything with:  kubectl apply -k k8s/
+# CI changes the image tag with:  kustomize edit set image kisansense=<registry>/kisansense:<sha>
+# (secret.yaml and servicemonitor.yaml are applied separately, see docs/GUIDE.md)
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: kisansense
+resources:
+  - 00-namespace.yaml
+  - deployment.yaml
+  - service.yaml
+  - hpa.yaml
+images:
+  - name: kisansense
+    newName: kisansense
+    newTag: v1

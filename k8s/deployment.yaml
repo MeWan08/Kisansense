@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kisansense
+  namespace: kisansense
+  labels: { app: kisansense }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5          # keeps old ReplicaSets so `kubectl rollout undo` works
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0            # never drop below the desired replica count during a rollout
+      maxSurge: 1
+  selector:
+    matchLabels: { app: kisansense }
+  template:
+    metadata:
+      labels:
+        app: kisansense
+        track: stable              # the canary Deployment uses track: canary
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: api
+          image: kisansense:v1     # kustomize replaces this tag, see kustomization.yaml
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: MODEL_VERSION
+              value: v1
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef: { name: kisansense-secret, key: api-key }
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { cpu: 500m, memory: 512Mi }
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 15
+            periodSeconds: 10

@@ -1,0 +1,43 @@
+# Local full stack: API + MLflow server + Prometheus + Grafana.
+#   dvc repro            (or: python src/make_dataset.py && python src/train.py) to create model.joblib
+#   docker compose up --build
+# API http://localhost:8080  MLflow http://localhost:5000  Prometheus http://localhost:9090
+# Grafana http://localhost:3000 (admin / admin)
+services:
+  api:
+    build: .
+    environment:
+      API_KEY: dev-key
+      MODEL_VERSION: local
+    ports: ["${API_HOST_PORT:-8080}:8080"]   # on Windows with Steam running: $env:API_HOST_PORT=8000
+
+  mlflow:
+    image: python:3.13-slim
+    command: >
+      sh -c "pip install --no-cache-dir mlflow==3.17.2 &&
+             mlflow server --host 0.0.0.0 --port 5000
+             --backend-store-uri sqlite:////mlflow/mlflow.db
+             --default-artifact-root /mlflow/artifacts"
+    volumes: ["mlflow-data:/mlflow"]
+    ports: ["5000:5000"]
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports: ["9090:9090"]
+    depends_on: [api]
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["3000:3000"]
+    depends_on: [prometheus]
+
+volumes:
+  mlflow-data:

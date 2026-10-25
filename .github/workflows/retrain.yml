@@ -1,0 +1,57 @@
+name: retrain
+
+# Triggered by hand, weekly, or by an alert webhook (repository_dispatch event "drift-detected").
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [drift-detected]
+  schedule:
+    - cron: "30 21 * * 0"   # Sunday 21:30 UTC, Monday 03:00 IST
+
+env:
+  MLFLOW_TRACKING_URI: sqlite:///mlflow.db
+  MLFLOW_DISABLE_TELEMETRY: "true"
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    # create-pull-request needs to push a branch and open a PR. Also enable
+    # Settings > Actions > General > "Allow GitHub Actions to create and approve pull requests".
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Pull latest data
+        run: dvc pull
+
+      # Reproduces only the stages whose inputs changed. Fails if the quality gate fails.
+      - name: Rerun pipeline
+        run: dvc repro
+
+      - name: Promote only if better than the current champion
+        run: python src/promote.py
+
+      # so the dvc.lock in the PR points at model files that exist in the remote
+      - name: Push new outputs to the DVC remote
+        run: dvc push
+
+      - name: Show metrics diff against main
+        run: dvc metrics show
+
+      - name: Open a pull request with the new lockfile and metrics
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "retrain: update dvc.lock and metrics"
+          title: "Retrained model (${{ github.event_name }})"
+          body: "Automated retrain. Merge to build and roll out the new image through ci.yml."
+          branch: retrain/auto

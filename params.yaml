@@ -1,0 +1,7 @@
+train:
+  n_estimators: 300
+  max_depth: 20
+  test_size: 0.2
+  seed: 42
+  min_f1: 0.95            # quality gate: fail the build below this macro F1
+  max_regional_gap: 0.10  # quality gate: max F1 gap between rainfall bands (a weak proxy, see MODEL_CARD)

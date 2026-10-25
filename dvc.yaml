@@ -1,0 +1,22 @@
+stages:
+  validate:
+    cmd: python src/validate.py data/raw/Crop_recommendation.csv
+    deps:
+      - src/validate.py
+      - src/config.py
+      - data/raw/Crop_recommendation.csv
+  train:
+    cmd: python src/train.py && python src/gate.py
+    deps:
+      - src/train.py
+      - src/gate.py
+      - src/config.py
+      - data/raw/Crop_recommendation.csv
+    params:
+      - train
+    outs:
+      - model.joblib
+      - data/reference.csv
+    metrics:
+      - metrics.json:
+          cache: false

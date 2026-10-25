@@ -1,0 +1,21 @@
+groups:
+  - name: kisansense
+    rules:
+      - alert: InputDriftDetected
+        expr: max(drift_detected) == 1
+        for: 1m
+        labels: { severity: warning }
+        annotations:
+          summary: "Input drift detected on the rolling window"
+      - alert: HighPredictionLatency
+        expr: histogram_quantile(0.95, sum(rate(predict_latency_seconds_bucket[5m])) by (le)) > 0.2
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "p95 prediction latency above 200 ms"
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.05
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "More than 5% of requests are failing"

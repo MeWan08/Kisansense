@@ -1,0 +1,39 @@
+# Optional canary: one pod of a new version next to the two stable pods.
+# The Service selects only `app: kisansense`, so about 1/3 of traffic reaches the canary.
+# Apply with: kubectl apply -f k8s/canary.yaml   (after editing the image tag)
+# Promote: update the main Deployment's image, then delete this one.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kisansense-canary
+  namespace: kisansense
+  labels: { app: kisansense }
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: kisansense, track: canary }
+  template:
+    metadata:
+      labels: { app: kisansense, track: canary }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: api
+          image: kisansense:v2
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: MODEL_VERSION
+              value: v2
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef: { name: kisansense-secret, key: api-key }
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { cpu: 500m, memory: 512Mi }
+          readinessProbe:
+            httpGet: { path: /health, port: http }
+            initialDelaySeconds: 3
