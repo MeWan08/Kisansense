@@ -139,11 +139,13 @@ jobs:
 
             cd /home/ec2-user/kisansense
 
-            # Set environment for compose
-            export ECR_REGISTRY=$REGISTRY/kisansense
-            export ECR_REGISTRY_FRONTEND=$REGISTRY/kisansense-frontend
-            export IMAGE_TAG=$TAG
-            export API_KEY=${{ secrets.API_KEY }}
+            # Write .env file so docker compose ALWAYS has the right variables
+            cat <<EOF > .env
+            ECR_REGISTRY=$REGISTRY/kisansense
+            ECR_REGISTRY_FRONTEND=$REGISTRY/kisansense-frontend
+            IMAGE_TAG=$TAG
+            API_KEY=${{ secrets.API_KEY }}
+            EOF
 
             # Pull latest images and restart
             docker compose -f docker-compose.prod.yml pull
