@@ -7,6 +7,13 @@ param([Parameter(Position = 0)][string]$Task = "help")
 
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
+
+# Automatically use the project's virtualenv binaries (python, mlflow, pytest, dvc)
+$VenvScripts = Join-Path $PSScriptRoot ".venv\Scripts"
+if (Test-Path $VenvScripts -and $env:PATH -notlike "*$VenvScripts*") {
+    $env:PATH = "$VenvScripts;$env:PATH"
+}
+
 $env:MLFLOW_DISABLE_TELEMETRY = "true"
 $env:MLFLOW_DISABLE_AGENT_HINT = "1"   # MLflow 3 prints a hint on stderr that PowerShell shows in red
 $env:PYTHONUTF8 = "1"             # avoid cp1252 UnicodeEncodeError from library output

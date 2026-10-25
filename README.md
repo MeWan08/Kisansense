@@ -62,3 +62,7 @@ drift detection over live traffic, pytest (16 tests), ruff, and YAML/JSON syntax
 Not run here, so expect to fix small things: the Docker build, `docker compose up`, the Kubernetes
 manifests on a real cluster, the GitHub Actions workflows, and anything touching AWS. The guide
 lists the commands and the usual failures for each.
+
+## Frontend workspace
+
+The modular React UI lives in [frontend/](frontend/README.md), with live API integration, an explicit demo mode, editable connection settings, and model drift telemetry. Run npm ci and npm run dev from that directory. See its README for static hosting and Docker deployment.

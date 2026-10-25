@@ -22,6 +22,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 from prometheus_client import (CONTENT_TYPE_LATEST, Counter, Gauge, Histogram,
                                generate_latest)
 
@@ -57,6 +58,7 @@ def log_event(msg, **fields):
 
 # ---- model, reference data, metrics -------------------------------------------------
 app = Flask(__name__)
+CORS(app)
 model = joblib.load(MODEL_PATH)
 reference = pd.read_csv(REFERENCE_PATH) if os.path.exists(REFERENCE_PATH) else None
 
