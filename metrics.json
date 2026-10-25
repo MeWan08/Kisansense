@@ -1,13 +1,14 @@
 {
-  "macro_f1": 0.9816,
-  "accuracy": 0.9818,
+  "macro_f1": 0.9696,
+  "accuracy": 0.9697,
   "regional_f1": {
-    "low_rain": 0.914,
-    "mid_rain": 1.0,
-    "high_rain": 0.9677
+    "low_rain": 0.9622,
+    "mid_rain": 0.9923,
+    "high_rain": 0.9689
   },
-  "regional_gap": 0.086,
-  "mlflow_run_id": "ac49430fa7714819baf8715d105b0541",
-  "model_uri": "models:/m-81be5b294d634ad99289d2ab2b7e9254",
-  "model_version": 1
+  "regional_gap": 0.0301,
+  "champion_f1_same_test": 0.9376,
+  "mlflow_run_id": "d51200cbde1e4a99916c65b412b281c5",
+  "model_uri": "models:/m-34f917279d3b46d387b3084cce521eec",
+  "model_version": 2
 }

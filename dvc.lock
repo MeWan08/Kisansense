@@ -5,8 +5,8 @@ stages:
     deps:
     - path: data/raw/Crop_recommendation.csv
       hash: md5
-      md5: 7a605192fe17a51c8a217f9673d1fce3
-      size: 108097
+      md5: da04b9dfd68c410012247bc61d933130
+      size: 172328
     - path: src/config.py
       hash: md5
       md5: 78fd13bd4c2919cb0d0a5a24251784af
@@ -20,8 +20,8 @@ stages:
     deps:
     - path: data/raw/Crop_recommendation.csv
       hash: md5
-      md5: 7a605192fe17a51c8a217f9673d1fce3
-      size: 108097
+      md5: da04b9dfd68c410012247bc61d933130
+      size: 172328
     - path: src/config.py
       hash: md5
       md5: 78fd13bd4c2919cb0d0a5a24251784af
@@ -46,13 +46,13 @@ stages:
     outs:
     - path: data/reference.csv
       hash: md5
-      md5: 262e067f6c9591fca42d97da93f1ad99
-      size: 73917
+      md5: 45f63c2bbf22b43df09eeb186d14331e
+      size: 114046
     - path: metrics.json
       hash: md5
-      md5: 0dfbaf5347193eeea37909db2f436001
-      size: 313
+      md5: 56118db6233565cdce8c97212fe01c88
+      size: 354
     - path: model.joblib
       hash: md5
-      md5: 83a311088fa7be1138b4650ffb146939
-      size: 14171689
+      md5: d9e44f284f790f85878e22ca93271285
+      size: 23098249
