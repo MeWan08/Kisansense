@@ -7,7 +7,7 @@ import { FlaskConical } from "lucide-react";
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
 import { Seo } from "./Seo";
-import { Skeleton } from "../ui";
+import { Skeleton, ChatWidget } from "../ui";
 import { isLocale } from "../../lib/i18n";
 import { writeStorage } from "../../lib/storage";
 import { useWorkspace } from "../../hooks/useWorkspace";
@@ -62,6 +62,7 @@ export function Layout() {
         </Suspense>
       </main>
       <Footer />
+      <ChatWidget />
     </>
   );
 }

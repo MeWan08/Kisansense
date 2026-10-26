@@ -8,6 +8,8 @@ services:
     environment:
       API_KEY: ${API_KEY:-changeme}
       MODEL_VERSION: ${IMAGE_TAG:-latest}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-qwen/qwen3.8-27b}
     ports: ["8080:8080"]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]

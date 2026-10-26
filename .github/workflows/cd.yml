@@ -146,6 +146,8 @@ jobs:
             ECR_REGISTRY_FRONTEND=$REGISTRY/kisansense-frontend
             IMAGE_TAG=$TAG
             API_KEY=${{ secrets.API_KEY }}
+            GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}
+            GROQ_MODEL=qwen/qwen3.8-27b
             EOF
 
             # Pull latest images and restart

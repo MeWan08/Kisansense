@@ -179,3 +179,6 @@ export function ErrorNotice({
     </div>
   );
 }
+
+export { ChatWidget } from "./ChatWidget";
+
