@@ -9,6 +9,8 @@ services:
     environment:
       API_KEY: dev-key
       MODEL_VERSION: local
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-qwen/qwen3.8-27b}
     ports: ["8088:8080"]
 
   mlflow:

@@ -1,10 +1,12 @@
 """KisanSense serving API (Flask).
 
 Endpoints
-  GET  /health    liveness and readiness, reports model version
-  POST /predict   top-3 crop recommendations (needs x-api-key header)
-  GET  /drift     current drift report over the rolling window of recent requests
-  GET  /metrics   Prometheus metrics (latency, counts, drift gauges)
+  GET  /health      liveness and readiness, reports model version
+  POST /predict     top-3 crop recommendations (needs x-api-key header)
+  GET  /drift       current drift report over the rolling window of recent requests
+  GET  /metrics     Prometheus metrics (latency, counts, drift gauges)
+  POST /chat        interactive chatbot for agricultural guidance
+  GET  /crops-info  crop knowledge base data for the frontend
 
 Every request is logged to stdout as one JSON line, ready for CloudWatch, Loki or `kubectl logs`.
 Run with a single gunicorn worker (several threads) so the in-memory window and
@@ -28,6 +30,7 @@ from prometheus_client import (CONTENT_TYPE_LATEST, Counter, Gauge, Histogram,
 
 from config import FEATURES, LOW_CONFIDENCE, RANGES, WINDOW_SIZE
 from drift import drift_report
+from knowledge import CROP_KNOWLEDGE, generate_response
 
 MODEL_PATH = os.getenv("MODEL_PATH", "model.joblib")
 REFERENCE_PATH = os.getenv("REFERENCE_PATH", "data/reference.csv")
@@ -178,6 +181,53 @@ def predict():
     if low:
         out["advice"] = "Low confidence. Please consult your local agriculture officer."
     return jsonify(out)
+
+
+@app.post("/chat")
+def chat():
+    """Interactive agricultural chatbot. Accepts a message and optional soil context."""
+    body = request.get_json(silent=True) or {}
+    message = body.get("message", "").strip()
+    context = body.get("context", {})
+    if not message:
+        return jsonify(error="message is required"), 400
+
+    # If soil data is provided, run a prediction to give context-aware advice
+    prediction = None
+    if all(f in context for f in FEATURES):
+        try:
+            x = [float(context[f]) for f in FEATURES]
+            proba = model.predict_proba(pd.DataFrame([x], columns=FEATURES))[0]
+            top = np.argsort(proba)[::-1][:3]
+            prediction = {
+                "recommendations": [
+                    {"crop": str(model.classes_[i]), "confidence": round(float(proba[i]), 3)}
+                    for i in top
+                ]
+            }
+        except Exception:
+            pass
+
+    result = generate_response(message, prediction)
+    log_event("chat", message=message[:100], has_context=bool(prediction))
+    return jsonify(result)
+
+
+@app.get("/crops-info")
+def crops_info():
+    """Return crop knowledge base data for the frontend."""
+    summary = []
+    for crop_id, info in CROP_KNOWLEDGE.items():
+        summary.append({
+            "id": crop_id,
+            "name": info["name"],
+            "emoji": info["emoji"],
+            "season": info["season"],
+            "regions": info["regions"][:4],
+            "temperature": info["temperature"],
+            "rainfall": info["rainfall"],
+        })
+    return jsonify(summary)
 
 
 if __name__ == "__main__":

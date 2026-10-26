@@ -54,3 +54,28 @@ def test_model_info(client):
     assert body["accuracy"] > 0.90
     assert body["macro_f1"] > 0.90
 
+
+def test_chat_endpoint(client):
+    # Test valid message
+    r = client.post("/chat", json={"message": "What crops are good for Punjab?"})
+    assert r.status_code == 200
+    data = r.get_json()
+    assert "reply" in data
+    assert "suggestions" in data
+    assert len(data["reply"]) > 0
+
+    # Test empty message returns 400
+    r_empty = client.post("/chat", json={"message": ""})
+    assert r_empty.status_code == 400
+
+
+def test_crops_info_endpoint(client):
+    r = client.get("/crops-info")
+    assert r.status_code == 200
+    data = r.get_json()
+    assert isinstance(data, list)
+    assert len(data) >= 20
+    assert any(c["id"] == "rice" for c in data)
+    assert any(c["id"] == "cotton" for c in data)
+
+
