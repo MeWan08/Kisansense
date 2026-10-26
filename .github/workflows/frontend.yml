@@ -1,0 +1,58 @@
+name: frontend
+on:
+  pull_request:
+    paths: ["frontend/**", ".github/workflows/frontend.yml"]
+  push:
+    branches: [main]
+    paths: ["frontend/**", ".github/workflows/frontend.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run test:contrast
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kisansense-frontend
+          path: frontend/dist
+  push-image:
+    needs: verify
+    if: github.ref == 'refs/heads/main' && vars.FRONTEND_ECR_PUSH == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push UI image
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          REPOSITORY: ${{ vars.FRONTEND_ECR_REPOSITORY }}
+          API_URL: ${{ vars.FRONTEND_API_URL }}
+          SITE_URL: ${{ vars.FRONTEND_SITE_URL }}
+        run: |
+          test -n "$REPOSITORY"
+          test -n "$API_URL"
+          IMAGE="$REGISTRY/$REPOSITORY:${GITHUB_SHA::8}"
+          docker build --build-arg "VITE_API_URL=$API_URL" --build-arg "VITE_SITE_URL=$SITE_URL" -t "$IMAGE" frontend
+          docker push "$IMAGE"
