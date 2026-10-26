@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir -r requirements-serve.txt
 COPY src/ src/
 COPY model.joblib .
 COPY data/reference.csv data/reference.csv
+COPY metrics.json .
 
 # the version string reported by /health and in every log line
 ARG MODEL_VERSION=dev

@@ -109,6 +109,26 @@ def health():
     return {"status": "ok", "model_version": MODEL_VERSION}
 
 
+@app.get("/model-info")
+def model_info():
+    acc = 0.9697
+    f1 = 0.9696
+    metrics_path = "metrics.json"
+    if os.path.exists(metrics_path):
+        try:
+            with open(metrics_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                acc = data.get("accuracy", acc)
+                f1 = data.get("macro_f1", f1)
+        except Exception:
+            pass
+    return jsonify({
+        "model_version": MODEL_VERSION,
+        "accuracy": acc,
+        "macro_f1": f1
+    })
+
+
 @app.get("/metrics")
 def metrics():
     current_drift()

@@ -42,3 +42,15 @@ def test_drift_endpoint_reports_not_enough_data_at_first(client):
     r = client.get("/drift")
     assert r.status_code == 200
     assert "drift" in r.get_json()
+
+
+def test_model_info(client):
+    r = client.get("/model-info")
+    assert r.status_code == 200
+    body = r.get_json()
+    assert "model_version" in body
+    assert "accuracy" in body
+    assert "macro_f1" in body
+    assert body["accuracy"] > 0.90
+    assert body["macro_f1"] > 0.90
+
