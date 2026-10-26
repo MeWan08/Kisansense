@@ -128,10 +128,11 @@ export function ChatWidget() {
 
   useEffect(() => {
     if (isOpen) {
-      setHasNewMessage(false);
-      setTimeout(() => inputRef.current?.focus(), 100);
+      const timer = setTimeout(() => inputRef.current?.focus(), 100);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
+
 
   const sendMessage = useCallback(
     async (text: string) => {
@@ -222,7 +223,10 @@ export function ChatWidget() {
           <motion.button
             className="chat-fab"
             id="chat-fab"
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              setIsOpen(true);
+              setHasNewMessage(false);
+            }}
             aria-label="Open chat assistant"
             initial={reduced ? false : { scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

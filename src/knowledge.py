@@ -3,6 +3,7 @@
 Contains curated agricultural information for all 22 crops in the dataset,
 including growing conditions, regional suitability, and best practices.
 """
+
 import os
 import requests
 from dotenv import load_dotenv
@@ -16,7 +17,16 @@ CROP_KNOWLEDGE = {
         "season": "Kharif (June–November)",
         "water": "High — requires standing water (paddy irrigation)",
         "soil": "Clayey loam, alluvial soils with good water retention",
-        "regions": ["West Bengal", "Punjab", "Haryana", "Uttar Pradesh", "Assam", "Tamil Nadu", "Kerala", "Andhra Pradesh"],
+        "regions": [
+            "West Bengal",
+            "Punjab",
+            "Haryana",
+            "Uttar Pradesh",
+            "Assam",
+            "Tamil Nadu",
+            "Kerala",
+            "Andhra Pradesh",
+        ],
         "temperature": "20–28°C",
         "rainfall": "150–300 mm",
         "tips": [
@@ -33,7 +43,14 @@ CROP_KNOWLEDGE = {
         "season": "Kharif (June–October) and Rabi (October–April)",
         "water": "Moderate — needs timely irrigation at tasseling and grain filling",
         "soil": "Well-drained sandy loam to loamy soils",
-        "regions": ["Rajasthan", "Madhya Pradesh", "Karnataka", "Andhra Pradesh", "Bihar", "Maharashtra"],
+        "regions": [
+            "Rajasthan",
+            "Madhya Pradesh",
+            "Karnataka",
+            "Andhra Pradesh",
+            "Bihar",
+            "Maharashtra",
+        ],
         "temperature": "22–28°C",
         "rainfall": "60–115 mm",
         "tips": [
@@ -135,7 +152,13 @@ CROP_KNOWLEDGE = {
         "season": "Kharif (July–October)",
         "water": "Low to moderate",
         "soil": "Heavy clay, loamy soils; tolerates mild salinity",
-        "regions": ["Madhya Pradesh", "Uttar Pradesh", "Tamil Nadu", "Andhra Pradesh", "Maharashtra"],
+        "regions": [
+            "Madhya Pradesh",
+            "Uttar Pradesh",
+            "Tamil Nadu",
+            "Andhra Pradesh",
+            "Maharashtra",
+        ],
         "temperature": "28–34°C",
         "rainfall": "55–70 mm",
         "tips": [
@@ -161,7 +184,10 @@ CROP_KNOWLEDGE = {
             "Harvest at physiological maturity to avoid shattering",
             "Phosphorus application is more critical than nitrogen",
         ],
-        "market": "Widely consumed across India; import-dependent, so domestic production has strong support",
+        "market": (
+            "Widely consumed across India; import-dependent, "
+            "so domestic production has strong support"
+        ),
     },
     "pomegranate": {
         "name": "Pomegranate",
@@ -203,7 +229,13 @@ CROP_KNOWLEDGE = {
         "season": "Flowering: Dec–Feb, Harvest: April–July",
         "water": "Low to moderate once established; critical during fruit development",
         "soil": "Deep alluvial soils, laterite soils; avoids waterlogging",
-        "regions": ["Uttar Pradesh (Dasheri, Langra)", "Andhra Pradesh (Banganapalli)", "Maharashtra (Alphonso)", "Gujarat (Kesar)", "Karnataka (Badami)"],
+        "regions": [
+            "Uttar Pradesh (Dasheri, Langra)",
+            "Andhra Pradesh (Banganapalli)",
+            "Maharashtra (Alphonso)",
+            "Gujarat (Kesar)",
+            "Karnataka (Badami)",
+        ],
         "temperature": "28–36°C",
         "rainfall": "40–100 mm",
         "tips": [
@@ -212,7 +244,10 @@ CROP_KNOWLEDGE = {
             "Pruning after harvest improves light penetration and next season's yield",
             "Hot water treatment (52°C, 5 min) essential for export quality",
         ],
-        "market": "India produces 40% of world's mangoes; huge export potential for Alphonso and Kesar",
+        "market": (
+            "India produces 40% of world's mangoes; "
+            "huge export potential for Alphonso and Kesar"
+        ),
     },
     "grapes": {
         "name": "Grapes",
@@ -220,7 +255,11 @@ CROP_KNOWLEDGE = {
         "season": "Pruning: Oct, Harvest: Feb–April (Thompson Seedless)",
         "water": "Moderate — drip irrigation with fertigation is standard",
         "soil": "Well-drained sandy loam, calcareous soils; pH 6.5–7.5",
-        "regions": ["Maharashtra (Nashik, Sangli, Solapur)", "Karnataka (Bijapur)", "Andhra Pradesh"],
+        "regions": [
+            "Maharashtra (Nashik, Sangli, Solapur)",
+            "Karnataka (Bijapur)",
+            "Andhra Pradesh",
+        ],
         "temperature": "25–35°C",
         "rainfall": "35–60 mm",
         "tips": [
@@ -271,7 +310,11 @@ CROP_KNOWLEDGE = {
         "season": "Harvest: July–October (varies by altitude)",
         "water": "Moderate — drip irrigation in modern orchards",
         "soil": "Well-drained loamy soils, slightly acidic (pH 5.5–6.5)",
-        "regions": ["Jammu & Kashmir (Shopian, Kupwara)", "Himachal Pradesh (Shimla, Kinnaur, Kullu)", "Uttarakhand"],
+        "regions": [
+            "Jammu & Kashmir (Shopian, Kupwara)",
+            "Himachal Pradesh (Shimla, Kinnaur, Kullu)",
+            "Uttarakhand",
+        ],
         "temperature": "18–24°C (needs 1000+ chilling hours)",
         "rainfall": "95–115 mm",
         "tips": [
@@ -288,7 +331,12 @@ CROP_KNOWLEDGE = {
         "season": "Mrig Bahar (June), Ambe Bahar (Feb) — two harvest seasons",
         "water": "Moderate — stress before flowering induces better blooming",
         "soil": "Well-drained loamy soils, slightly acidic to neutral",
-        "regions": ["Maharashtra (Nagpur, Vidarbha)", "Madhya Pradesh", "Rajasthan", "Northeast India"],
+        "regions": [
+            "Maharashtra (Nagpur, Vidarbha)",
+            "Madhya Pradesh",
+            "Rajasthan",
+            "Northeast India",
+        ],
         "temperature": "22–26°C",
         "rainfall": "90–110 mm",
         "tips": [
@@ -331,7 +379,10 @@ CROP_KNOWLEDGE = {
             "Drip irrigation + mulching with coconut husk improves yields",
             "Harvest every 45 days for copra; every 30 days for tender coconut",
         ],
-        "market": "Kerala and Karnataka dominate; coconut oil, copra, coir, and tender coconut all have markets",
+        "market": (
+            "Kerala and Karnataka dominate; coconut oil, copra, "
+            "coir, and tender coconut all have markets"
+        ),
     },
     "cotton": {
         "name": "Cotton",
@@ -339,7 +390,14 @@ CROP_KNOWLEDGE = {
         "season": "Kharif (June–December)",
         "water": "Moderate — critical at square formation and boll development",
         "soil": "Deep black cotton soil (vertisol), loamy soils",
-        "regions": ["Gujarat", "Maharashtra", "Telangana", "Madhya Pradesh", "Rajasthan", "Andhra Pradesh"],
+        "regions": [
+            "Gujarat",
+            "Maharashtra",
+            "Telangana",
+            "Madhya Pradesh",
+            "Rajasthan",
+            "Andhra Pradesh",
+        ],
         "temperature": "25–35°C",
         "rainfall": "60–110 mm",
         "tips": [
@@ -373,14 +431,21 @@ CROP_KNOWLEDGE = {
         "season": "Flowering: March, Harvest: Nov–Feb (Arabica), Jan–April (Robusta)",
         "water": "Moderate — shade-grown, irrigation during dry spells",
         "soil": "Well-drained laterite, forest loam; acidic (pH 5.5–6.5)",
-        "regions": ["Karnataka (Coorg, Chikmagalur, Hassan)", "Kerala (Wayanad)", "Tamil Nadu (Nilgiris, Yercaud)"],
+        "regions": [
+            "Karnataka (Coorg, Chikmagalur, Hassan)",
+            "Kerala (Wayanad)",
+            "Tamil Nadu (Nilgiris, Yercaud)",
+        ],
         "temperature": "23–28°C",
         "rainfall": "100–175 mm",
         "tips": [
             "India grows both Arabica (high altitude) and Robusta (lower altitude)",
             "Shade trees (silver oak, erythrina) are essential for quality",
             "White stem borer is a major pest — trapping and removal required",
-            "Specialty/single-origin Indian coffees (Monsooned Malabar) fetch premium export prices",
+            (
+                "Specialty/single-origin Indian coffees (Monsooned Malabar) "
+                "fetch premium export prices"
+            ),
         ],
         "market": "80% of Indian coffee is exported; growing domestic café culture",
     },
@@ -390,21 +455,59 @@ CROP_KNOWLEDGE = {
 INTENTS = {
     "greeting": {
         "patterns": ["hello", "hi", "hey", "namaste", "good morning", "good evening", "help"],
-        "response": "Hello! 🌾 I'm KisanBot, your agricultural assistant. I can help you with:\n\n• **Crop recommendations** — Tell me your soil and weather conditions\n• **Growing guides** — Ask about any of our 22 supported crops\n• **Regional advice** — Find crops suited to your area\n• **Best practices** — Soil management, irrigation, pest control tips\n\nHow can I help you today?",
+        "response": (
+            "Hello! 🌾 I'm KisanBot, your agricultural assistant. I can help you with:\n\n"
+            "• **Crop recommendations** — Tell me your soil and weather conditions\n"
+            "• **Growing guides** — Ask about any of our 22 supported crops\n"
+            "• **Regional advice** — Find crops suited to your area\n"
+            "• **Best practices** — Soil management, irrigation, pest control tips\n\n"
+            "How can I help you today?"
+        ),
     },
     "farewell": {
         "patterns": ["bye", "goodbye", "thank", "thanks", "dhanyavaad"],
-        "response": "You're welcome! 🙏 Remember, KisanSense is always here to help. Happy farming! 🌾",
+        "response": (
+            "You're welcome! 🙏 Remember, KisanSense is always here to help. "
+            "Happy farming! 🌾"
+        ),
     },
     "what_is": {
         "patterns": ["what is kisansense", "what does this do", "about", "what can you do"],
-        "response": "KisanSense is an ML-powered crop advisory system for Indian farmers. 🌾\n\n**What it does:**\n• Analyzes your soil nutrients (N, P, K, pH) and weather (temperature, humidity, rainfall)\n• Recommends the top 3 best-suited crops with confidence scores\n• Monitors model health and data drift in real-time\n\n**How to use it:**\n1. Go to **Crop Advisory** page\n2. Enter your soil test values and weather conditions\n3. Get instant, AI-powered crop recommendations\n\nThe model is trained on Indian agricultural data covering 22 crops across 12+ agro-climatic zones!",
+        "response": (
+            "KisanSense is an ML-powered crop advisory system for Indian farmers. 🌾\n\n"
+            "**What it does:**\n"
+            "• Analyzes your soil nutrients (N, P, K, pH) and weather "
+            "(temperature, humidity, rainfall)\n"
+            "• Recommends the top 3 best-suited crops with confidence scores\n"
+            "• Monitors model health and data drift in real-time\n\n"
+            "**How to use it:**\n"
+            "1. Go to **Crop Advisory** page\n"
+            "2. Enter your soil test values and weather conditions\n"
+            "3. Get instant, AI-powered crop recommendations\n\n"
+            "The model is trained on Indian agricultural data covering "
+            "22 crops across 12+ agro-climatic zones!"
+        ),
+
     },
     "soil_help": {
         "patterns": ["soil test", "how to test soil", "npk", "where to test", "soil testing"],
-        "response": "**How to get your soil tested** 🧪\n\n1. **Nearest KVK (Krishi Vigyan Kendra)** — Free or low-cost soil testing\n2. **State Agricultural University labs** — Professional analysis\n3. **Soil Health Card Scheme** — Government of India provides free testing\n   - Visit: soilhealth.dac.gov.in\n4. **Private labs** — Quick results (2–3 days)\n\n**What you need:**\n• Collect soil from 6–8 spots in your field at 15 cm depth\n• Mix them together, take a 500g sample\n• Air-dry before submitting\n\nYou'll get N (Nitrogen), P (Phosphorus), K (Potassium), and pH values — enter these directly into KisanSense!",
+        "response": (
+            "**How to get your soil tested** 🧪\n\n"
+            "1. **Nearest KVK (Krishi Vigyan Kendra)** — Free or low-cost soil testing\n"
+            "2. **State Agricultural University labs** — Professional analysis\n"
+            "3. **Soil Health Card Scheme** — Government of India provides free testing\n"
+            "   - Visit: soilhealth.dac.gov.in\n"
+            "4. **Private labs** — Quick results (2–3 days)\n\n"
+            "**What you need:**\n"
+            "• Collect soil from 6–8 spots in your field at 15 cm depth\n"
+            "• Mix them together, take a 500g sample\n"
+            "• Air-dry before submitting\n\n"
+            "You'll get N (Nitrogen), P (Phosphorus), K (Potassium), and pH values — "
+            "enter these directly into KisanSense!"
+        ),
     },
 }
+
 
 # Regional suggestions by broad zone
 REGIONAL_CROPS = {
@@ -460,14 +563,29 @@ def find_crop_info(message: str) -> dict | None:
             return {"crop_id": crop_id, **info}
     # Common Hindi/alias names
     aliases = {
-        "chana": "chickpea", "dal": "lentil", "masoor": "lentil",
-        "rajma": "kidneybeans", "toor": "pigeonpeas", "arhar": "pigeonpeas",
-        "moong": "mungbean", "urad": "blackgram", "matki": "mothbeans",
-        "santra": "orange", "kapas": "cotton", "dhan": "rice",
-        "gehu": "maize", "makka": "maize", "nariyal": "coconut",
-        "kela": "banana", "aam": "mango", "seb": "apple",
-        "angoor": "grapes", "tarbooz": "watermelon", "kharbooza": "muskmelon",
-        "anar": "pomegranate", "papita": "papaya",
+        "chana": "chickpea",
+        "dal": "lentil",
+        "masoor": "lentil",
+        "rajma": "kidneybeans",
+        "toor": "pigeonpeas",
+        "arhar": "pigeonpeas",
+        "moong": "mungbean",
+        "urad": "blackgram",
+        "matki": "mothbeans",
+        "santra": "orange",
+        "kapas": "cotton",
+        "dhan": "rice",
+        "gehu": "maize",
+        "makka": "maize",
+        "nariyal": "coconut",
+        "kela": "banana",
+        "aam": "mango",
+        "seb": "apple",
+        "angoor": "grapes",
+        "tarbooz": "watermelon",
+        "kharbooza": "muskmelon",
+        "anar": "pomegranate",
+        "papita": "papaya",
     }
     for alias, crop_id in aliases.items():
         if alias in msg_lower:
@@ -512,23 +630,33 @@ def format_region_response(region_info: dict) -> str:
     return (
         f"🗺️ **{region_info['zone']}**\n\n"
         f"Best crops for this region: **{crops_str}**\n\n"
-        f"Would you like to know more about any specific crop? "
-        f"You can also enter your soil readings on the **Crop Advisory** page for a precise recommendation!"
+        "Would you like to know more about any specific crop? "
+        "You can also enter your soil readings on the **Crop Advisory** "
+        "page for a precise recommendation!"
     )
 
 
-GROQ_SYSTEM_PROMPT = """You are KisanBot, an intelligent, empathetic agricultural advisory assistant built into the KisanSense platform.
-Your mission is to help Indian farmers, agricultural extension workers, and students make sound agronomic decisions.
+GROQ_SYSTEM_PROMPT = """You are KisanBot, an intelligent, empathetic agricultural advisory
+assistant built into the KisanSense platform.
+Your mission is to help Indian farmers, agricultural extension workers, and students make
+sound agronomic decisions.
 
 KisanSense features a machine learning model for 22 crops:
-Rice, Maize, Chickpea (Chana), Kidneybeans (Rajma), Pigeonpeas (Arhar/Toor), Mothbeans (Matki), Mungbean (Moong), Blackgram (Urad), Lentil (Masoor), Pomegranate (Anar), Banana (Kela), Mango (Aam), Grapes (Angoor), Watermelon (Tarbooz), Muskmelon (Kharbooza), Apple (Seb), Orange (Santra), Papaya (Papita), Coconut (Nariyal), Cotton (Kapas), Jute, Coffee.
+Rice, Maize, Chickpea (Chana), Kidneybeans (Rajma), Pigeonpeas (Arhar/Toor),
+Mothbeans (Matki), Mungbean (Moong), Blackgram (Urad), Lentil (Masoor),
+Pomegranate (Anar), Banana (Kela), Mango (Aam), Grapes (Angoor), Watermelon (Tarbooz),
+Muskmelon (Kharbooza), Apple (Seb), Orange (Santra), Papaya (Papita),
+Coconut (Nariyal), Cotton (Kapas), Jute, Coffee.
 
 Guidelines:
-1. Provide accurate, practical farming advice tailored to Indian soils (Alluvial, Black, Red, Laterite, Sandy), seasons (Kharif, Rabi, Zaid), and agro-climatic zones.
-2. Structure your answers with clear formatting: bullet points, bold key terms, and emojis for readability.
+1. Provide accurate, practical farming advice tailored to Indian soils (Alluvial, Black,
+   Red, Laterite, Sandy), seasons (Kharif, Rabi, Zaid), and agro-climatic zones.
+2. Structure your answers with clear formatting: bullet points, bold key terms, and emojis.
 3. Keep responses concise, direct, and conversational (around 2-4 short sections or bullet points).
-4. If the user mentions regional Indian crop names (like chana, toor, dhan, kapas, gehu), recognize and use them naturally.
-5. If KisanSense model predictions or soil inputs are given, explain why the recommended crop suits those conditions and suggest next agricultural steps.
+4. If the user mentions regional Indian crop names (like chana, toor, dhan, kapas, gehu),
+   recognize and use them naturally.
+5. If KisanSense model predictions or soil inputs are given, explain why the recommended crop
+   suits those conditions and suggest next agricultural steps.
 """
 
 
@@ -542,10 +670,13 @@ def call_groq_llm(message: str, prediction: dict | None = None) -> dict | None:
     user_prompt = message
     if prediction and "recommendations" in prediction:
         recs_text = ", ".join(
-            f"{r['crop'].title()} ({r['confidence']*100:.1f}%)"
+            f"{r['crop'].title()} ({r['confidence'] * 100:.1f}%)"
             for r in prediction["recommendations"]
         )
-        user_prompt += f"\n\n[Context from KisanSense ML Model: The model analyzed soil & weather readings and recommended: {recs_text}]"
+        user_prompt += (
+            "\n\n[Context from KisanSense ML Model: The model analyzed "
+            f"soil & weather readings and recommended: {recs_text}]"
+        )
 
     try:
         resp = requests.post(
@@ -570,7 +701,9 @@ def call_groq_llm(message: str, prediction: dict | None = None) -> dict | None:
             content = data["choices"][0]["message"]["content"].strip()
             if content:
                 crop_info = find_crop_info(message)
-                crop_card = {"id": crop_info["crop_id"], "name": crop_info["name"]} if crop_info else None
+                crop_card = (
+                    {"id": crop_info["crop_id"], "name": crop_info["name"]} if crop_info else None
+                )
                 suggestions = [
                     "Best crops for my region",
                     "How to test soil",
@@ -611,7 +744,11 @@ def generate_response(message: str, prediction: dict | None = None) -> dict:
     intent = match_intent(message)
     if intent:
         if intent["type"] == "greeting":
-            suggestions = ["What crops grow in my area?", "Tell me about cotton", "How to test soil"]
+            suggestions = [
+                "What crops grow in my area?",
+                "Tell me about cotton",
+                "How to test soil",
+            ]
         return {"reply": intent["response"], "suggestions": suggestions, "crop_card": None}
 
     # Crop information requests
@@ -624,7 +761,11 @@ def generate_response(message: str, prediction: dict | None = None) -> dict:
             "Compare with another crop",
             "Go to Crop Advisory",
         ]
-        return {"reply": reply, "suggestions": suggestions, "crop_card": {"id": crop_id, "name": crop_info["name"]}}
+        return {
+            "reply": reply,
+            "suggestions": suggestions,
+            "crop_card": {"id": crop_id, "name": crop_info["name"]},
+        }
 
     # Regional queries
     region_info = find_region(message)
@@ -639,31 +780,52 @@ def generate_response(message: str, prediction: dict | None = None) -> dict:
         if recs:
             top = recs[0]
             crop_info = CROP_KNOWLEDGE.get(top["crop"])
-            reply = f"Based on your soil and weather data, **{top['crop'].title()}** is the best match "
-            reply += f"with **{top['confidence']*100:.0f}%** confidence!\n\n"
+            reply = (
+                f"Based on your soil and weather data, **{top['crop'].title()}** is the best match "
+            )
+            reply += f"with **{top['confidence'] * 100:.0f}%** confidence!\n\n"
             if crop_info:
                 reply += format_crop_response({"crop_id": top["crop"], **crop_info})
             suggestions = [f"Tell me about {r['crop']}" for r in recs[:3]]
-            return {"reply": reply, "suggestions": suggestions, "crop_card": {"id": top["crop"], "name": top["crop"].title()}}
+            return {
+                "reply": reply,
+                "suggestions": suggestions,
+                "crop_card": {"id": top["crop"], "name": top["crop"].title()},
+            }
 
     # Comparison queries
     msg_lower = message.lower()
-    if "compare" in msg_lower or "difference" in msg_lower or "vs" in msg_lower or "versus" in msg_lower:
+    if (
+        "compare" in msg_lower
+        or "difference" in msg_lower
+        or "vs" in msg_lower
+        or "versus" in msg_lower
+    ):
         return {
-            "reply": "I can help you compare crops! 🔄\n\nPlease mention two crops you'd like to compare, for example:\n• \"Compare rice and maize\"\n• \"Rice vs cotton\"\n\nOr tell me your soil and weather conditions, and I'll suggest the best options!",
-            "suggestions": ["Compare rice and maize", "Compare cotton and jute", "Tell me about chickpea"],
+            "reply": (
+                "I can help you compare crops! 🔄\n\n"
+                "Please mention two crops you'd like to compare, for example:\n"
+                '• "Compare rice and maize"\n'
+                '• "Rice vs cotton"\n\n'
+                "Or tell me your soil and weather conditions, and I'll suggest the best options!"
+            ),
+            "suggestions": [
+                "Compare rice and maize",
+                "Compare cotton and jute",
+                "Tell me about chickpea",
+            ],
             "crop_card": None,
         }
+
 
     # Default fallback
     return {
         "reply": "I'm not sure I understood that. 🤔 Here are some things I can help with:\n\n"
-               "• **Crop information** — Ask about any of the 22 crops (e.g., \"Tell me about rice\")\n"
-               "• **Regional advice** — Mention your state (e.g., \"Best crops for Maharashtra\")\n"
-               "• **Soil testing** — Learn how to test your soil\n"
-               "• **Recommendations** — Go to the Crop Advisory page and enter your readings\n\n"
-               "Try asking me something specific!",
+        '• **Crop information** — Ask about any of the 22 crops (e.g., "Tell me about rice")\n'
+        '• **Regional advice** — Mention your state (e.g., "Best crops for Maharashtra")\n'
+        "• **Soil testing** — Learn how to test your soil\n"
+        "• **Recommendations** — Go to the Crop Advisory page and enter your readings\n\n"
+        "Try asking me something specific!",
         "suggestions": ["Tell me about rice", "Best crops for Gujarat", "How to test soil"],
         "crop_card": None,
     }
-
