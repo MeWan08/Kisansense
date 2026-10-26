@@ -1,0 +1,17 @@
+{
+  "eyebrow": "ABOUT KISANSENSE",
+  "title": "A useful model. An open process.",
+  "intro": "KisanSense connects field readings to crop suggestions, with the monitoring needed to question those suggestions over time.",
+  "methodTitle": "How the recommendation works",
+  "methodBody": "A Random Forest with 300 trees compares seven inputs against patterns learned from 22 crop classes. The three highest vote shares are returned. These scores are not calibrated probabilities of yield or profit.",
+  "dataTitle": "Where the data comes from",
+  "dataBody": "The project model card describes the Kaggle Crop Recommendation dataset with simulated seasonal shifts, totaling 3,300 rows. Data versions are tracked with DVC. The crop library summarizes the checked-in workspace data snapshot, not location-specific farming prescriptions.",
+  "limitsTitle": "What the model cannot know",
+  "limitsBody": "Market prices, irrigation access, seed varieties, pests, labour, and district-specific factors are not inputs. The source dataset is cleaner and more balanced than real farm data. Discuss recommendations with a local agriculture officer before planting.",
+  "monitorTitle": "How the model is monitored",
+  "monitorBody": "A Kolmogorov–Smirnov test compares recent requests with reference inputs. A meaningful shift prompts human review. A retrained candidate must pass the quality gate and outperform the current champion before promotion.",
+  "useTitle": "Built for advice, not eligibility decisions",
+  "useBody": "Do not use this system to decide insurance, loans, or access to financial services.",
+  "reviewTitle": "Language review",
+  "reviewBody": "Hindi and Marathi translations need review by native-speaking agricultural advisors, especially soil-test units, confidence wording, and drift terminology."
+}

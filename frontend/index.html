@@ -2,20 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <meta name="theme-color" content="#0b0f19" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f6f5f0" />
     <meta
       name="description"
-      content="KisanSense precision crop advisory. Explore soil and climate conditions, compare crop recommendations, and monitor model health."
+      content="Field intelligence for Indian farmers. Explore crop recommendations, soil and climate profiles, and transparent model monitoring."
     />
-    <title>KisanSense — Precision Agronomy</title>
+    <meta property="og:title" content="KisanSense — Field intelligence" />
+    <meta
+      property="og:description"
+      content="Know your field. Make a more informed crop decision."
+    />
+    <meta property="og:type" content="website" />
+    <title>KisanSense — Field intelligence</title>
+    <script>
+      try {
+        const t = localStorage.getItem("ks-theme");
+        const d =
+          t === "dark" ||
+          ((!t || t === "system") &&
+            matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.classList.toggle("dark", d);
+        document.documentElement.style.colorScheme = d ? "dark" : "light";
+        const l = location.pathname.split("/")[1];
+        if (["en", "hi", "mr"].includes(l)) document.documentElement.lang = l;
+      } catch {}
+    </script>
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2310b981'/%3E%3Cpath d='M17 44C12 20 35 16 49 15c0 23-12 34-27 27l21-20' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
     />
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
