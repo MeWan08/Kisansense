@@ -19,14 +19,16 @@ const Context = createContext<Workspace | null>(null);
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const query = useQueryClient();
   const [revision, setRevision] = useState(0);
-  const [connection, set] = useState<Connection>(() => ({
-    baseUrl:
-      readStorage("ks-url") ||
-      import.meta.env.VITE_API_URL ||
-      "http://127.0.0.1:8000",
-    apiKey: import.meta.env.VITE_API_KEY || "",
-    mock: import.meta.env.VITE_USE_MOCK === "true",
-  }));
+  const [connection, set] = useState<Connection>(() => {
+    const stored = readStorage("ks-url");
+    const configured = import.meta.env.VITE_API_URL;
+    return {
+      baseUrl:
+        stored || configured || (import.meta.env.DEV ? "http://127.0.0.1:8000" : "/api"),
+      apiKey: import.meta.env.VITE_API_KEY || "dev-key",
+      mock: import.meta.env.VITE_USE_MOCK === "true",
+    };
+  });
   const [observations, setObservations] = useState<Observation[]>([]);
   function setConnection(next: Connection) {
     void query.cancelQueries();

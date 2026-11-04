@@ -17,7 +17,17 @@ export class ApiError extends Error {
   }
 }
 export function normalizeUrl(value: string) {
-  const url = new URL(value.trim());
+  const trimmed = value.trim();
+  if (trimmed === "" || trimmed === "/api" || trimmed === "/api/") {
+    return "/api";
+  }
+  if (trimmed.startsWith("/")) {
+    if (trimmed.includes("?") || trimmed.includes("#")) {
+      throw new Error("urlError");
+    }
+    return trimmed.replace(/\/+$/, "");
+  }
+  const url = new URL(trimmed);
   if (
     !["http:", "https:"].includes(url.protocol) ||
     url.username ||
@@ -42,8 +52,14 @@ export async function request<T>(
   const timer = setTimeout(abort, 15000);
   try {
     const base = normalizeUrl(connection.baseUrl);
-    const transport =
-      import.meta.env.DEV && base === "http://127.0.0.1:8000" ? "/api" : base;
+    let transport = base;
+    if (
+      (import.meta.env.DEV && (base === "http://127.0.0.1:8000" || base === "http://localhost:8000")) ||
+      base === "/api" ||
+      (typeof window !== "undefined" && base.includes(":8080"))
+    ) {
+      transport = "/api";
+    }
     const response = await fetch(`${transport}${path}`, {
       method: body ? "POST" : "GET",
       signal: controller.signal,
