@@ -151,8 +151,11 @@ export function ChatWidget() {
       try {
         const rawBase = connection.baseUrl.replace(/\/+$/, "");
         const base =
-          import.meta.env.DEV &&
-          (rawBase === "http://127.0.0.1:8000" || rawBase === "http://localhost:8000")
+          (import.meta.env.DEV &&
+            (rawBase === "http://127.0.0.1:8000" || rawBase === "http://localhost:8000")) ||
+          rawBase === "/api" ||
+          rawBase === "" ||
+          (typeof window !== "undefined" && rawBase.includes(":8080"))
             ? "/api"
             : rawBase;
 
